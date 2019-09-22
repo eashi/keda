@@ -632,6 +632,8 @@ func (h *ScaleHandler) getScaler(scaledObject *keda_v1alpha1.ScaledObject, trigg
 		return scalers.NewExternalScaler(scaledObject, resolvedEnv, trigger.Metadata)
 	case "liiklus":
 		return scalers.NewLiiklusScaler(resolvedEnv, trigger.Metadata)
+	case "emad":
+		return scalers.NewEmadScaler(resolvedEnv, trigger.Metadata)
 	default:
 		return nil, fmt.Errorf("no scaler found for type: %s", trigger.Type)
 	}

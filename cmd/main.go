@@ -11,7 +11,7 @@ import (
 	"github.com/kedacore/keda/pkg/kubernetes"
 	"github.com/kedacore/keda/pkg/signals"
 	"k8s.io/apiserver/pkg/util/logs"
-
+	
 	// workaround go dep management system
 	_ "golang.org/x/tools/imports"
 	_ "k8s.io/code-generator/pkg/util"

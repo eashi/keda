@@ -82,7 +82,7 @@ spec:
       serviceAccountName: keda-operator
       containers:
       - name: keda-operator
-        image: kedacore/keda:latest
+        image: 192.168.99.167:5000/emadkeda:v3
         args:
         - /adapter
         - --secure-port=6443
