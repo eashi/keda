@@ -1,0 +1,45 @@
+package scalers
+
+import (
+	"context"
+
+	"k8s.io/api/autoscaling/v2beta1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/metrics/pkg/apis/external_metrics"
+)
+
+const (
+	twitterMetricName = "twitterMentionMetric"
+)
+
+type twitterScaler struct {
+	metadata *twitterMetadata
+}
+
+type twitterMetadata struct {
+	targetTwitterStatus int
+}
+
+func (s *twitterScaler) GetMetricSpecForScaling() []v2beta1.MetricSpec {
+	targetTwitterStatus := resource.NewQuantity(int64(s.metadata.targetTwitterStatus), resource.DecimalSI)
+	externalMetric := &v2beta1.ExternalMetricSource{MetricName: twitterMetricName, TargetAverageValue: targetTwitterStatus}
+	metricSpec := v2beta1.MetricSpec{External: externalMetric, Type: externalMetricType}
+	return []v2beta1.MetricSpec{metricSpec}
+}
+
+func (s *twitterScaler) GetMetrics(ctx context.Context, metricName string, metricSelector labels.Selector) ([]external_metrics.ExternalMetricValue, error) {
+
+	//TODO: Get value from Twitter
+
+	//TODO: Transform value you got from Twitter and give it the right weight
+	xxx := 5
+	metric := external_metrics.ExternalMetricValue{
+		MetricName: metricName,
+		Value:      *resource.NewQuantity(int64(xxx), resource.DecimalSI),
+		Timestamp:  metav1.Now(),
+	}
+
+	return append([]external_metrics.ExternalMetricValue{}, metric), nil
+}
