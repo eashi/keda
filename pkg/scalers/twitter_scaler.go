@@ -59,6 +59,18 @@ func ParseTwitterScalerMetadata(metadata, resolvedEnv map[string]string) (*twitt
 		return nil, fmt.Errorf("no accountToMonitor given")
 	}
 
+	if val, ok := metadata["accessKey"]; ok && val != "" {
+		meta.accessKey = val
+	} else {
+		return nil, fmt.Errorf("no accessKey given")
+	}
+
+	if val, ok := metadata["accessSecret"]; ok && val != "" {
+		meta.accessSecret = val
+	} else {
+		return nil, fmt.Errorf("no accessSecret given")
+	}
+
 	return &meta, nil
 }
 
