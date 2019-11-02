@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	twitterMetricName = "twitterMentionMetric"
+	twitterMetricName = "targetTwitterStatus"
 )
 
 type twitterScaler struct {
@@ -59,19 +59,28 @@ func ParseTwitterScalerMetadata(metadata, resolvedEnv map[string]string) (*twitt
 	if val, ok := metadata["accountToMonitor"]; ok && val != "" {
 		meta.accountToMonitor = val
 	} else {
-		return nil, fmt.Errorf("no accountToMonitor given")
+		errorMessage := "Error parsing twitter scaler metadata: no accountToMonitor given"
+
+		log.Errorf(errorMessage)
+		return nil, fmt.Errorf(errorMessage)
 	}
 
 	if val, ok := metadata["accessKey"]; ok && val != "" {
 		meta.accessKey = val
 	} else {
-		return nil, fmt.Errorf("no accessKey given")
+		errorMessage := "Error parsing twitter scaler metadata: no accessKey given"
+
+		log.Errorf(errorMessage)
+		return nil, fmt.Errorf(errorMessage)
 	}
 
 	if val, ok := metadata["accessSecret"]; ok && val != "" {
 		meta.accessSecret = val
 	} else {
-		return nil, fmt.Errorf("no accessSecret given")
+		errorMessage := "Error parsing twitter scaler metadata: no accessSecret given"
+
+		log.Errorf(errorMessage)
+		return nil, fmt.Errorf(errorMessage)
 	}
 
 	return &meta, nil

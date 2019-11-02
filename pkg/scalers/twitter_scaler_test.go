@@ -2,6 +2,7 @@ package scalers
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -16,42 +17,54 @@ func TestParseTwitterScalerMetadata(t *testing.T) {
 		resolvedEnv map[string]string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    *twitterMetadata
-		wantErr bool
+		name       string
+		args       args
+		want       *twitterMetadata
+		wantErr    bool
+		errorShape error
 	}{
 		{
 			"No Access Key",
-			args{map[string]string{"targetTwitterStatus": "10", "accountToMonitor": "jeffhallon", "accessKey": "", "accessSecret": ""}, nil},
+			args{map[string]string{"targetTwitterStatus": "10y", "accountToMonitor": "jeffhallon", "accessKey": "", "accessSecret": ""}, nil},
 			nil,
 			true,
+			fmt.Errorf("Error parsing twitter scaler metadata targetTwitterStatus: strconv.Atoi: parsing \"10y\": invalid syntax"),
 		},
 		{
 			"No accountToMonitor supplied",
 			args{map[string]string{"targetTwitterStatus": "10", "accountToMonitor": "", "accessKey": "", "accessSecret": ""}, nil},
 			nil,
 			true,
+			fmt.Errorf("Error parsing twitter scaler metadata: no accountToMonitor given"),
 		},
 		{
 			"No accessSecret supplied",
-			args{map[string]string{"targetTwitterStatus": "10", "accountToMonitor": "", "accessKey": "", "accessSecret": ""}, nil},
+			args{map[string]string{"targetTwitterStatus": "10", "accountToMonitor": "xx", "accessKey": "123", "accessSecret": ""}, nil},
 			nil,
 			true,
+			fmt.Errorf("Error parsing twitter scaler metadata: no accessSecret given"),
 		},
 		{
 			"All configs are good",
 			args{map[string]string{"targetTwitterStatus": "10", "accountToMonitor": "jeffhollan", "accessKey": "mykey", "accessSecret": "mysecret"}, nil},
 			&twitterMetadata{targetTwitterStatus: 10, accountToMonitor: "jeffhollan", accessKey: "mykey", accessSecret: "mysecret"},
 			false,
+			fmt.Errorf("Error parsing twitter scaler metadata %s: %s", twitterMetricName, ""),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ParseTwitterScalerMetadata(tt.args.metadata, tt.args.resolvedEnv)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ParseTwitterScalerMetadata() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if err != nil {
+				if tt.wantErr {
+					if err.Error() != tt.errorShape.Error() {
+						t.Errorf("Not matching error message, expected '%s', but reseived '%s'.", tt.errorShape, err)
+					}
+				} else {
+					t.Errorf("ParseTwitterScalerMetadata() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseTwitterScalerMetadata() = %v, want %v", got, tt.want)
